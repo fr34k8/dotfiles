@@ -285,6 +285,7 @@ export PATH=$PATH:$HOME/Library/_LocalApps/depot_tools:$HOME/Library/_LocalApps/
 export PATH=/usr/local/share/python:$PATH
 
 alias git=hub
+alias imgopt="open -a /Applications/ImageOptim.app $1"
 
 [[ -s "/Users/mtigas/.rvm/scripts/rvm" ]] && source "/Users/mtigas/.rvm/scripts/rvm"
 
