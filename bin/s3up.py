@@ -45,6 +45,7 @@ Please double-check and set the following options below before using:
   UPLOAD_PARALLELIZATION
   CHUNKING_MIN_SIZE
   CHUNK_RETRIES
+(Note, you can also set these in `dotfiles_config.py` -- see example file.)
 """
 from __future__ import print_function
 import os
@@ -62,7 +63,7 @@ AWS_ACCESS_KEY_ID = ''
 AWS_SECRET_ACCESS_KEY = ''
 
 # When only giving one or two args, the following bucket is used:
-DEFAULT_BUCKET = 'my-awesome-bucket'
+DEFAULT_BUCKET = ''
 
 # If you have a CNAME for this bucket (or, even better, a CNAME for a
 # CloudFront for this bucket) you can throw that in here, with the protocol you
@@ -84,6 +85,18 @@ CHUNKING_MIN_SIZE = 5242880
 # re-upload the entire file.
 CHUNK_RETRIES = 10
 
+# Load/override options from optional `dotfiles_config.py` file.
+OPTIONS = set(['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY',
+    'DEFAULT_BUCKET', 'BUCKET_CNAME', 'UPLOAD_PARALLELIZATION',
+    'CHUNKING_MIN_SIZE', 'CHUNK_RETRIES'])
+for option in OPTIONS:
+    try:
+        _cfg = __import__('dotfiles_config', globals(), locals(), [option,], -1)
+        if _cfg and hasattr(_cfg, option):
+            globals()[option] = getattr(_cfg, option)
+        del _cfg
+    except:
+        pass
 
 # ========== "MultiPart" (chunked) upload utility methods ==========
 
