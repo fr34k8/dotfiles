@@ -40,12 +40,14 @@ s3up-private filename [expiration_time]
     an access URL.
 
 Please set the following options below before using:
-    AWS_ACCESS_KEY_ID
-    AWS_SECRET_ACCESS_KEY
-    DEFAULT_BUCKET
+    AWS_ACCESS_KEY_ID (also accepted as an env var)
+    AWS_SECRET_ACCESS_KEY (also accepted as an env var)
+    AWS_DEFAULT_BUCKET (also accepted as an env var)
+    S3_ENDPOINT
     DEFAULT_EXPIRES
     FILENAME_HASHER
-(Note, you can also set these in `dotfiles_config.py` -- see example file.)
+(Note, you can also set these in `dotfiles_config.py` -- see example file.
+That file overrides identical AWS_* environment variables.)
 """
 from __future__ import print_function
 import hashlib
@@ -56,9 +58,12 @@ from boto.s3.connection import S3Connection, OrdinaryCallingFormat
 from datetime import datetime
 from mimetypes import guess_type
 
-AWS_ACCESS_KEY_ID = ''
-AWS_SECRET_ACCESS_KEY = ''
-DEFAULT_BUCKET = ''
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
+
+AWS_DEFAULT_BUCKET = os.environ.get('AWS_DEFAULT_BUCKET', '')
+
+S3_ENDPOINT = "s3.amazonaws.com"
 
 DEFAULT_EXPIRES = 3600
 
@@ -66,7 +71,7 @@ FILENAME_HASHER = hashlib.sha224
 
 # Load/override options from optional `dotfiles_config.py` file.
 OPTIONS = set(['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY',
-    'DEFAULT_BUCKET', 'DEFAULT_EXPIRES', 'FILENAME_HASHER'])
+    'AWS_DEFAULT_BUCKET', 'S3_ENDPOINT', 'DEFAULT_EXPIRES', 'FILENAME_HASHER'])
 for option in OPTIONS:
     try:
         _cfg = __import__('dotfiles_config', globals(), locals(), [option,], -1)
@@ -76,13 +81,25 @@ for option in OPTIONS:
     except:
         pass
 
+if not (AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY):
+    configfile = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        'dotfiles_config.py'
+    )
+    print("`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` must be set,",
+        file=sys.stderr)
+    print("either as environment varibles or in:", file=sys.stderr)
+    print("    %s" % configfile, file=sys.stderr)
+    sys.exit(1)
+
 # ========== Uploader methods ==========
 
 def key_to_secure_url(key, bucket, link_expires):
     s3 = S3Connection(
         aws_access_key_id=AWS_ACCESS_KEY_ID,
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-        calling_format=OrdinaryCallingFormat()
+        calling_format=OrdinaryCallingFormat(),
+        host=S3_ENDPOINT
     )
     bucket = s3.get_bucket(bucket)
     k = bucket.get_key(key)
@@ -101,7 +118,7 @@ def easy_up(local_file, link_expires=DEFAULT_EXPIRES):
         remote_path = rpath+"/"+os.path.basename(local_file)
         remote_path = hashed_filename(remote_path)
 
-        upload_file(os.path.abspath(local_file), DEFAULT_BUCKET, remote_path)
+        upload_file(os.path.abspath(local_file), AWS_DEFAULT_BUCKET, remote_path)
 
         if not link_expires:
             # Expiration time is set to zero.
@@ -109,7 +126,7 @@ def easy_up(local_file, link_expires=DEFAULT_EXPIRES):
             print("s3-genlink.py %s [expiration_time]" % remote_path)
         else:
             # Have a time
-            print(key_to_secure_url(remote_path, DEFAULT_BUCKET, link_expires))
+            print(key_to_secure_url(remote_path, AWS_DEFAULT_BUCKET, link_expires))
             print(file=sys.stderr)
             print("To generate a new link:", file=sys.stderr)
             print("s3-genlink.py %s [expiration_time]" % remote_path, file=sys.stderr)
@@ -120,7 +137,8 @@ def upload_file(local_file, bucket, remote_path):
     s3 = S3Connection(
         aws_access_key_id=AWS_ACCESS_KEY_ID,
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-        calling_format=OrdinaryCallingFormat()
+        calling_format=OrdinaryCallingFormat(),
+        host=S3_ENDPOINT
     )
     bucket = s3.get_bucket(bucket)
     key = bucket.new_key(remote_path)
@@ -140,7 +158,7 @@ def main(args):
         easy_up(args[0])
     else:
         print("s3up-private filename [expiration_time]")
-        print("    Uploads the given file to DEFAULT_BUCKET (%s)" % DEFAULT_BUCKET)
+        print("    Uploads the given file to AWS_DEFAULT_BUCKET (%s)" % AWS_DEFAULT_BUCKET)
         print("    at the following path:" )
         print()
         print("        files/YYYYMMDD/(filename)")

@@ -33,24 +33,28 @@ s3-genlink.py remote_path [expiration_time]
 
 
 Please set the following options below before using:
-    AWS_ACCESS_KEY_ID
-    AWS_SECRET_ACCESS_KEY
-    DEFAULT_BUCKET
+    AWS_ACCESS_KEY_ID (also accepted as an env var)
+    AWS_SECRET_ACCESS_KEY (also accepted as an env var)
+    AWS_DEFAULT_BUCKET (also accepted as an env var)
+    S3_ENDPOINT
     DEFAULT_EXPIRES
     FILENAME_HASHER
 (Note, you can also set these in `dotfiles_config.py` -- see example file.)
 """
 from __future__ import print_function
 import hashlib
+import os
 import sys
 import traceback
 from boto.s3.connection import S3Connection
 from boto.s3.connection import OrdinaryCallingFormat
 
-AWS_ACCESS_KEY_ID = ''
-AWS_SECRET_ACCESS_KEY = ''
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
 
-DEFAULT_BUCKET = ''
+AWS_DEFAULT_BUCKET = os.environ.get('AWS_DEFAULT_BUCKET', '')
+
+S3_ENDPOINT = "s3.amazonaws.com"
 
 DEFAULT_EXPIRES = 3600
 
@@ -58,7 +62,7 @@ FILENAME_HASHER = hashlib.sha224
 
 # Load/override options from optional `dotfiles_config.py` file.
 OPTIONS = set(['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY',
-    'DEFAULT_BUCKET', 'DEFAULT_EXPIRES', 'FILENAME_HASHER'])
+    'AWS_DEFAULT_BUCKET', 'S3_ENDPOINT', 'DEFAULT_EXPIRES', 'FILENAME_HASHER'])
 for option in OPTIONS:
     try:
         _cfg = __import__('dotfiles_config', globals(), locals(), [option,], -1)
@@ -68,15 +72,27 @@ for option in OPTIONS:
     except:
         pass
 
+if not (AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY):
+    configfile = os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        'dotfiles_config.py'
+    )
+    print("`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` must be set,",
+        file=sys.stderr)
+    print("either as environment varibles or in:", file=sys.stderr)
+    print("    %s" % configfile, file=sys.stderr)
+    sys.exit(1)
+
 # ========== Uploader methods ==========
 
 def key_to_secure_url(key, bucket=None, link_expires=DEFAULT_EXPIRES):
     if not bucket:
-        bucket = DEFAULT_BUCKET
+        bucket = AWS_DEFAULT_BUCKET
 
     s3 = S3Connection(
         aws_access_key_id=AWS_ACCESS_KEY_ID,
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+        host=S3_ENDPOINT,
         calling_format=OrdinaryCallingFormat()
     )
     bucket = s3.get_bucket(bucket)
@@ -85,7 +101,7 @@ def key_to_secure_url(key, bucket=None, link_expires=DEFAULT_EXPIRES):
 
 def main(args):
     if len(args) == 2:
-        key_to_secure_url(args[0], DEFAULT_BUCKET, int(args[1]))
+        key_to_secure_url(args[0], AWS_DEFAULT_BUCKET, int(args[1]))
     elif len(args) == 1:
         key_to_secure_url(args[0])
     else:

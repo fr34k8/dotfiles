@@ -32,7 +32,7 @@ Usage:
 Before using, please configure at least the following options in `s3up.py`:
     AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY
-    DEFAULT_BUCKET
+    AWS_DEFAULT_BUCKET
     BUCKET_CNAME
 (Note, you can also set these in `dotfiles_config.py` -- see example file.)
 """
@@ -45,7 +45,7 @@ setdefaulttimeout(100.0)
 
 def upload_dir(local_dir, remote_dir, bucket=None, bucket_url=None):
     if not bucket:
-        bucket = s3up.DEFAULT_BUCKET
+        bucket = s3up.AWS_DEFAULT_BUCKET
     for root, dirs, files in os.walk(local_dir):
         for f in files:
             fullfile = os.path.join(root, f).strip()
@@ -71,7 +71,7 @@ def main(args):
         if not os.path.isdir(local_dir):
             print "First argument is not a valid local directory."
             sys.exit(1)
-        upload_dir(local_dir,"files/"+args[1], s3up.DEFAULT_BUCKET, s3up.BUCKET_CNAME)
+        upload_dir(local_dir,"files/"+args[1], s3up.AWS_DEFAULT_BUCKET, s3up.BUCKET_CNAME)
     else:
         print "Usage:"
         print "s3up-dir local_directory remote_directory"
