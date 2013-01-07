@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # coding=utf-8
 """
 s3up-dir.py
@@ -40,12 +40,63 @@ import sys
 import traceback
 import os
 import s3up
+from boto.s3.connection import S3Connection
 from socket import setdefaulttimeout
 setdefaulttimeout(100.0)
+
+# TODO
+# note: not compatible with multipart (parallelized) upload due to
+# different etag calculation.
+# see https://forums.aws.amazon.com/thread.jspa?messageID=203436
+USE_DELTA_UPLOAD = False
+
+def should_upload_file(local_file_path, bucket, remote_file_path):
+    """
+    Logic to handle skipping file uploads.
+
+    * Skip temporary / cache-like files.
+    """
+    if not (
+        (remote_file_path.find('.svn') == -1) and
+        (remote_file_path.find('.svn-base') == -1) and
+        (remote_file_path.find('.DS_Store') == -1) and
+        (remote_file_path.find('.pyo') == -1) and
+        (remote_file_path.find('.pyc') == -1)
+    ):
+        return False
+
+    # TODO
+    if USE_DELTA_UPLOAD:
+        s3 = S3Connection(
+            aws_access_key_id=s3up.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=s3up.AWS_SECRET_ACCESS_KEY,
+            host=s3up.S3_ENDPOINT
+        )
+        bucket_obj = s3.get_bucket(bucket)
+        key = bucket_obj.get_key(remote_file_path) or None
+        if key and getattr(key, 'etag', None):
+            local_hash = None
+            try:
+                with open(local_file_path, 'rb') as f_obj:
+                    local_hash = key.compute_md5(f_obj)
+            except:
+                pass
+            etag = key.etag.strip('"').strip("'")
+            print "local file: ", local_file_path
+            print "local hash: ", local_hash[0]
+            print "remote file: ", remote_file_path
+            print "remote etag: ", etag
+            if local_hash and (etag == local_hash[0]):
+                return False
+        else:
+            return True
+
+    return True
 
 def upload_dir(local_dir, remote_dir, bucket=None, bucket_url=None):
     if not bucket:
         bucket = s3up.AWS_DEFAULT_BUCKET
+
     for root, dirs, files in os.walk(local_dir):
         for f in files:
             fullfile = os.path.join(root, f).strip()
@@ -54,16 +105,29 @@ def upload_dir(local_dir, remote_dir, bucket=None, bucket_url=None):
                 remotefile = remote_dir+"/"+remotefile
             if remotefile[0] == "/":
                 remotefile = remotefile[1:]
-            if (remotefile.find('.svn') == -1) and \
-                (remotefile.find('.svn-base') == -1) and \
-                (remotefile.find('.DS_Store') == -1) and \
-                (remotefile.find('.pyo') == -1) and \
-                (remotefile.find('.pyc') == -1):
-                    s3up.upload_file(fullfile,bucket,remotefile)
-                    if not bucket_url:
-                        print "https://s3.amazonaws.com/%s/%s" % (bucket,remotefile)
-                    else:
-                        print "%s%s" % (bucket_url,remotefile)
+            if should_upload_file(fullfile, bucket, remotefile):
+                if not USE_DELTA_UPLOAD:
+                    # cannot use multipart with deltas
+                    s3up.upload_file(fullfile, bucket, remotefile)
+                else:
+                    # TODO
+                    s3 = S3Connection(
+                        aws_access_key_id=s3up.AWS_ACCESS_KEY_ID,
+                        aws_secret_access_key=s3up.AWS_SECRET_ACCESS_KEY,
+                        host=s3up.S3_ENDPOINT
+                    )
+                    bucket_obj = s3.get_bucket(bucket)
+                    key = bucket_obj.get_key(remotefile) or bucket_obj.new_key(remotefile)
+                    key.set_contents_from_filename(fullfile,
+                        policy="public-read")
+                    key.make_public()
+                if not bucket_url:
+                    print "https://s3.amazonaws.com/%s/%s" % (bucket,remotefile)
+                else:
+                    print "%s%s" % (bucket_url,remotefile)
+            else:
+                print "Skipped %s" % remotefile
+
 
 def main(args):
     if len(args) == 2:
