@@ -210,10 +210,13 @@ alias stop_postgres="pg_ctl -D /usr/local/var/postgres stop -s -m fast"
 alias start_mongo="sudo mongod run --config /usr/local/Cellar/mongodb/1.8.1-x86_64/mongod.conf"
 
 tunnel1() { # webfaction
-    ssh -v2aNCD 14230 -c aes256-cbc,aes256-ctr -m hmac-ripemd160 108.59.4.65
+    ssh -v2aNCD 14230 -c aes256-ctr -m hmac-ripemd160 108.59.4.65
 }
 tunnel2() { # slice
     ssh -v2aNCD 14230 -c blowfish-cbc,arcfour256 -m hmac-sha1 173.45.236.2
+}
+irctunnel() { # slice
+    ssh -v2aNCL 14240:irc.mozilla.org:6697 -L 14241:irc.oftc.net:6697 -c aes256-ctr -m hmac-sha1 173.45.236.2
 }
 cprx() {
     PROFTEMPDIR="/tmp/cprx-`date +\"%Y%m%d-%H%M\"`"
@@ -225,10 +228,10 @@ cprx() {
     rm -fr PROFTEMPDIR
 }
 convert_x264() {
-    ffmpeg -i $1 -f mp4 -threads 0 -vcodec libx264 -vpre hqi -level 31 -crf 25 -acodec libfaac -ab 96kb -ac 2 -y $2
+    ffmpeg -i $1 -f mp4 -threads 0 -vcodec libx264 -vpre hqi -level 31 -crf 25 -acodec libfaac -ab 96kb -ac 2 -async 30 -y $2
 }
 convert_x264_fast() {
-    ffmpeg -i $1 -f mp4 -threads 0 -vcodec libx264 -vpre fast -level 31 -crf 25 -acodec libfaac -ab 96kb -ac 2 -y $2
+    ffmpeg -i $1 -f mp4 -threads 0 -vcodec libx264 -vpre fast -level 31 -crf 25 -acodec libfaac -ab 96kb -ac 2 -async 30 -y $2
 }
 pngup() {
 	pngcrush -rem alla $1 $1.new &&\
@@ -245,7 +248,7 @@ pngcompress() {
 }
 test_http_size() {
 	echo "gzip"
-    curl -ks -H "User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2) Gecko/20100105 Firefox/3.6" -H "Accept-encoding: gzip" $*|wc -c
+    curl -ks -H "User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2) Gecko/20100105 Firefox/3.6" -H "Accept-encoding: gzip, deflate" $*|wc -c
 	echo "raw"
     curl -ks -H "User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2) Gecko/20100105 Firefox/3.6" $*|wc -c
 	echo "raw (headers only)"
@@ -266,6 +269,9 @@ slow_net() {
 }
 slow_net_off() {
     sudo ipfw delete 1
+}
+imgup() {
+    open -W -a /Applications/ImageOptim.app $1 && s3up $1 && rm $1
 }
 
 export DJANGO_SETTINGS_MODULE=localdev.settings
@@ -292,7 +298,7 @@ alias imgopt="open -a /Applications/ImageOptim.app $1"
 export PATH=/usr/local/Cellar/npm/0.2.2/share/npm/bin:$PATH
 export NODE_PATH=/usr/local/Cellar/npm/0.2.2/lib/node:$NODE_PATH
 
-export PATH=/usr/local/Cellar/python/2.7.1/bin:$PATH
+export PATH=/usr/local/Cellar/python/2.7.3/bin:$PATH
 export PATH=/usr/local/Cellar/ruby/1.9.3-p0/bin:$PATH
 
 export EDITOR="mvim --remote-wait"
