@@ -209,13 +209,13 @@ alias start_postgres="pg_ctl -D /usr/local/var/postgres -l /usr/local/var/postgr
 alias stop_postgres="pg_ctl -D /usr/local/var/postgres stop -s -m fast"
 alias start_mongo="sudo mongod run --config /usr/local/Cellar/mongodb/1.8.1-x86_64/mongod.conf"
 
-tunnel1() { # webfaction
+tunnel1() {
     ssh -v2aNCD 14230 -c aes256-ctr -m hmac-ripemd160 108.59.4.65
 }
-tunnel2() { # slice
+tunnel2() {
     ssh -v2aNCD 14230 -c arcfour256 -m hmac-sha1 173.45.236.2
 }
-irctunnel() { # webfaction
+irctunnel() {
     ssh -v2aNCL 14240:irc.mozilla.org:6697 -c arcfour256,aes256-ctr -m hmac-sha1 173.45.236.2
 }
 cprx() {
