@@ -218,9 +218,6 @@ tunnel2() { # slice
 irctunnel() { # webfaction
     ssh -v2aNCL 14240:irc.mozilla.org:6697 -c arcfour256,aes256-ctr -m hmac-sha1 173.45.236.2
 }
-irctunnel() { # slice
-    ssh -v2aNCL 14240:irc.mozilla.org:6697 -L 14241:irc.oftc.net:6697 -c aes256-ctr -m hmac-sha1 173.45.236.2
-}
 cprx() {
     PROFTEMPDIR="/tmp/cprx-`date +\"%Y%m%d-%H%M\"`"
 
