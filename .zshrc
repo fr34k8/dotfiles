@@ -213,7 +213,10 @@ tunnel1() { # webfaction
     ssh -v2aNCD 14230 -c aes256-ctr -m hmac-ripemd160 108.59.4.65
 }
 tunnel2() { # slice
-    ssh -v2aNCD 14230 -c blowfish-cbc,arcfour256 -m hmac-sha1 173.45.236.2
+    ssh -v2aNCD 14230 -c arcfour256 -m hmac-sha1 173.45.236.2
+}
+irctunnel() { # webfaction
+    ssh -v2aNCL 14240:irc.mozilla.org:6697 -c arcfour256,aes256-ctr -m hmac-sha1 173.45.236.2
 }
 irctunnel() { # slice
     ssh -v2aNCL 14240:irc.mozilla.org:6697 -L 14241:irc.oftc.net:6697 -c aes256-ctr -m hmac-sha1 173.45.236.2
@@ -310,3 +313,4 @@ export SVN_EDITOR="mvim --remote-wait"
 #export http_proxy=http://127.0.0.1:8118
 #export https_proxy=http://127.0.0.1:8118
 
+alias airport=/System/Library/PrivateFrameworks/Apple80211.framework/Versions/A/Resources/airport
