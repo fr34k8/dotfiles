@@ -48,7 +48,7 @@ git_prompt_info() {
     echo `/usr/bin/ruby -e "print (%x{git branch 2> /dev/null}.grep(/^\*/).first || '').gsub(/^\* (.+)$/, '\1:')"`
 }
 setopt prompt_subst
-PROMPT='%n %# '
+PROMPT='%n@%m %# '
 RPROMPT='$PR_YELLOW$(git_prompt_info)$PR_GREEN%~% $PR_NO_COLOR'
 
 ### tab autocomplete options ###
@@ -254,9 +254,6 @@ test_http_size() {
 	echo "raw (headers only)"
     curl -ks -H "User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2) Gecko/20100105 Firefox/3.6" -I $*|wc -c
 }
-gpg_sign_to_clipboard() {
-    gpg --clearsign -a --comment "Public Key - https://s3.amazonaws.com/media.miketigas.com/public_key_2010.txt"|pbcopy
-}
 write_signed_email() {
 	cat /Users/mtigas/Documents/sig-raw.txt|mate_wait|gpg -a --clearsign|pbcopy
 }
@@ -273,41 +270,41 @@ slow_net_off() {
 imgup() {
     open -W -a /Applications/ImageOptim.app $1 && s3up $1 && rm $1
 }
-
-export DJANGO_SETTINGS_MODULE=localdev.settings
-#export PYTHONOPTIMIZE=1
-export PIP_RESPECT_VIRTUALENV=true
-
-export PYTHONPATH="$HOME/Code/libs"
-
-export PATH=/usr/local/bin:/usr/local/sbin:$PATH
-
-export PATH=$HOME/Code/libs:$PATH:$HOME/Library/_LocalApps/clean_access_workaround
-export PATH="/usr/local/pgsql/bin:$PATH"
-export PATH=/Library/Frameworks/UnixImageIO.framework/Programs:$PATH
-export PATH=/Library/Frameworks/PROJ.framework/Programs:$PATH
-export PATH=/Library/Frameworks/GDAL.framework/Programs:$PATH
-export PATH=$PATH:$HOME/Library/_LocalApps/depot_tools:$HOME/Library/_LocalApps/go
-export PATH=/usr/local/share/python:$PATH
-
 alias git=hub
 alias imgopt="open -a /Applications/ImageOptim.app $1"
-
-[[ -s "/Users/mtigas/.rvm/scripts/rvm" ]] && source "/Users/mtigas/.rvm/scripts/rvm"
-
-export PATH=/usr/local/Cellar/npm/0.2.2/share/npm/bin:$PATH
-export NODE_PATH=/usr/local/Cellar/npm/0.2.2/lib/node:$NODE_PATH
-
-export PATH=/usr/local/Cellar/python/2.7.3/bin:$PATH
-export PATH=/usr/local/Cellar/ruby/1.9.3-p0/bin:$PATH
 
 export EDITOR="mvim --remote-wait"
 export SVN_EDITOR="mvim --remote-wait"
 
-#export TWITTER_USERNAME=""
-#export TWITTER_PASSWORD=""
-
-#export http_proxy=http://127.0.0.1:8118
-#export https_proxy=http://127.0.0.1:8118
-
+# airport no longer lives in /usr/bin or /sbin as of OSX 10.8
 alias airport=/System/Library/PrivateFrameworks/Apple80211.framework/Versions/A/Resources/airport
+
+###################################
+
+# Basic path + dotfiles scripts
+export PATH=/usr/local/bin:/usr/local/sbin:$PATH
+export PATH=$HOME/Code/dotfiles/bin:$HOME/Code/libs:$PATH
+
+# system libs via Homebrew
+export PATH="/usr/local/pgsql/bin:$PATH"
+export PATH=/Library/Frameworks/UnixImageIO.framework/Programs:$PATH
+export PATH=/Library/Frameworks/PROJ.framework/Programs:$PATH
+export PATH=/Library/Frameworks/GDAL.framework/Programs:$PATH
+
+# go
+# export PATH=$PATH:$HOME/Library/_LocalApps/depot_tools:$HOME/Library/_LocalApps/go
+
+# node
+#export PATH=/usr/local/Cellar/npm/0.2.2/share/npm/bin:$PATH
+#export NODE_PATH=/usr/local/Cellar/npm/0.2.2/lib/node:$NODE_PATH
+
+# rubby
+#export PATH=/usr/local/Cellar/ruby/1.9.3-p0/bin:$PATH
+#[[ -s "/Users/mtigas/.rvm/scripts/rvm" ]] && source "/Users/mtigas/.rvm/scripts/rvm"
+
+# pythons
+export DJANGO_SETTINGS_MODULE=localdev.settings
+export PIP_RESPECT_VIRTUALENV=true
+export PYTHONPATH=$HOME/Code/libs:$PYTHONPATH
+export PATH=/usr/local/share/python:$PATH
+export PATH=/usr/local/Cellar/python/2.7.3/bin:$PATH
