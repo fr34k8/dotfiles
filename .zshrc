@@ -228,10 +228,10 @@ cprx() {
     rm -fr PROFTEMPDIR
 }
 convert_x264() {
-    ffmpeg -i $1 -f mp4 -threads 0 -vcodec libx264 -vpre hqi -level 31 -crf 25 -acodec libfaac -ab 96kb -ac 2 -async 30 -y $2
+    ffmpeg -i $1 -f mp4 -threads 0 -vcodec h264 -vpre hqi -level 31 -crf 25 -acodec libfaac -ab 96k -ac 2 -async 30 -y $2
 }
-convert_x264_fast() {
-    ffmpeg -i $1 -f mp4 -threads 0 -vcodec libx264 -vpre fast -level 31 -crf 25 -acodec libfaac -ab 96kb -ac 2 -async 30 -y $2
+convert_x264_b() {
+    ffmpeg -i $1 -f mp4 -threads 0 -vcodec h264 -level 31 -crf 25 -acodec libfaac -ab 96k -ac 2 -async 30 -y $2
 }
 pngup() {
 	pngcrush -rem alla $1 $1.new &&\
