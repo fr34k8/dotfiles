@@ -193,10 +193,7 @@ pack_code() {
     done
 }
 alias sloc="find . -name \"*.css\" -o -name \"*.php\" -o -name \"*.js\" -o -name \"*.py\" -o -name \"*.sh\" | xargs wc -l"
-alias s3up=~/Code/libs/s3up.py
-alias s3dir=~/Code/libs/s3dir.py
-alias flac2lame=~/Code/libs/flac2lame.py
-alias aimpacketconvert=~/Code/libs/aimpacketconvert.py
+alias s3up=s3up.py
 
 alias 7z="/Applications/eZ\ 7z.app/Contents/Resources/7za"
 alias 7za="/Applications/eZ\ 7z.app/Contents/Resources/7za"
@@ -283,7 +280,7 @@ alias airport=/System/Library/PrivateFrameworks/Apple80211.framework/Versions/A/
 
 # Basic path + dotfiles scripts
 export PATH=/usr/local/bin:/usr/local/sbin:$PATH
-export PATH=$HOME/Code/dotfiles/bin:$HOME/Code/libs:$PATH
+export PATH=$HOME/Code/dotfiles/bin:$HOME/bin:$PATH
 
 # system libs via Homebrew
 export PATH="/usr/local/pgsql/bin:$PATH"
@@ -299,12 +296,12 @@ export PATH=/Library/Frameworks/GDAL.framework/Programs:$PATH
 #export NODE_PATH=/usr/local/Cellar/npm/0.2.2/lib/node:$NODE_PATH
 
 # rubby
-#export PATH=/usr/local/Cellar/ruby/1.9.3-p0/bin:$PATH
-#[[ -s "/Users/mtigas/.rvm/scripts/rvm" ]] && source "/Users/mtigas/.rvm/scripts/rvm"
+export PATH="$HOME/.rbenv/bin:$PATH"
+if which rbenv > /dev/null; then eval "$(rbenv init - zsh)"; fi
 
 # pythons
 export DJANGO_SETTINGS_MODULE=localdev.settings
 export PIP_RESPECT_VIRTUALENV=true
-export PYTHONPATH=$HOME/Code/libs:$PYTHONPATH
+export PYTHONPATH=$HOME/Code/dotfiles/bin:$HOME/bin:$PYTHONPATH
 export PATH=/usr/local/share/python:$PATH
 export PATH=/usr/local/Cellar/python/2.7.3/bin:$PATH
