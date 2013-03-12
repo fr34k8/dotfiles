@@ -254,6 +254,10 @@ test_http_size() {
 write_signed_email() {
 	cat /Users/mtigas/Documents/sig-raw.txt|mate_wait|gpg -a --clearsign|pbcopy
 }
+sign_clipboard() {
+    echo "Signing contents of clipboard..."
+    pbpaste|gpg -a --clearsign|pbcopy
+}
 write_email() {
 	cat /Users/mtigas/Documents/sig-raw.html|mate_wait|pbcopy
 }

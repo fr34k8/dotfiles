@@ -2,6 +2,7 @@ set guioptions-=T
 
 set cursorline
 set colorcolumn=80
+set lines=40 columns=84
 highlight ColorColumn ctermbg=darkgrey guibg=#1e1e1e
 
 set transparency=2
