@@ -179,18 +179,24 @@ pack_code() {
         print $i
         hdiutil compact -batteryallowed $i
     done
-    for i in `find ~/Documents -name "*.sparse*"`
+    for i in `find ~/Backups -name "*.sparse*"`
     do
         print
         print $i
         hdiutil compact -batteryallowed $i
     done
-    for i in `find ~/Library/_LocalApps -name "*.sparse*"`
+    for i in `find ~/Dropbox/Documents -name "*.sparse*"`
     do
         print
         print $i
-        hdiutil compact -verbose -batteryallowed $i
+        hdiutil compact -batteryallowed $i
     done
+    #for i in `find ~/Library/_LocalApps -name "*.sparse*"`
+    #do
+    #    print
+    #    print $i
+    #    hdiutil compact -verbose -batteryallowed $i
+    #done
 }
 alias sloc="find . -name \"*.css\" -o -name \"*.php\" -o -name \"*.js\" -o -name \"*.py\" -o -name \"*.sh\" | xargs wc -l"
 alias s3up=s3up.py
@@ -211,6 +217,9 @@ tunnel1() {
 }
 tunnel2() {
     ssh -v2aNCD 14230 -c arcfour256 -m hmac-sha1 173.45.236.2
+}
+tunnel3() {
+    ssh -v2aNCD 14230 -c aes256-ctr -m hmac-sha1 198.61.228.27
 }
 irctunnel() {
     ssh -v2aNCL 14240:irc.mozilla.org:6697 -c arcfour256,aes256-ctr -m hmac-sha1 173.45.236.2
@@ -235,7 +244,7 @@ pngup() {
 	rm $1 &&\
 	mv $1.new $1 &&\
 	optipng -i1 -o7 $1 &&\
-	s3up $1
+	s3up.py $1
 }
 pngcompress() {
 	pngcrush -rem alla $1 $1.new &&\
@@ -269,16 +278,18 @@ slow_net_off() {
     sudo ipfw delete 1
 }
 imgup() {
-    open -W -a /Applications/ImageOptim.app $1 && s3up $1 && rm $1
+    open -W -a /Applications/ImageOptim.app $1 && s3up.py $1 && rm $1
 }
 alias git=hub
 alias imgopt="open -a /Applications/ImageOptim.app $1"
 
-export EDITOR="mvim --remote-wait"
-export SVN_EDITOR="mvim --remote-wait"
+export EDITOR="mvim -f --remote-wait"
+export SVN_EDITOR="mvim -f --remote-wait"
 
 # airport no longer lives in /usr/bin or /sbin as of OSX 10.8
 alias airport=/System/Library/PrivateFrameworks/Apple80211.framework/Versions/A/Resources/airport
+
+export GPG_TTY=`tty`
 
 ###################################
 

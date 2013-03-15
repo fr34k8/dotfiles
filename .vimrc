@@ -41,3 +41,7 @@ au BufRead,BufNewFile {Gemfile,Vagrantfile} set ft=ruby
 
 nnoremap <silent> <F6> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar>:nohl<CR>
 
+let g:GPGExecutable="/usr/local/bin/gpg"
+let g:GPGPreferSign=1
+let g:GPGDefaultRecipients=["3082B5A3"]
+let g:GPGUseAgent=0
