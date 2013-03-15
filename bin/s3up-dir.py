@@ -33,6 +33,7 @@ Before using, please configure at least the following options in `s3up.py`:
     AWS_ACCESS_KEY_ID
     AWS_SECRET_ACCESS_KEY
     AWS_DEFAULT_BUCKET
+    S3_ENDPOINT
     BUCKET_CNAME
 (Note, you can also set these in `dotfiles_config.py` -- see example file.)
 """
