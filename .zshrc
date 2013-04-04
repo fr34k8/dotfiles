@@ -233,6 +233,31 @@ cprx() {
 
     rm -fr PROFTEMPDIR
 }
+chrc() {
+    PROFTEMPDIR="/tmp/cprx-`date +\"%Y%m%d-%H%M\"`"
+
+    "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary"\
+    --user-data-dir=$PROFTEMPDIR
+
+    rm -fr PROFTEMPDIR
+}
+cprxt() {
+    PROFTEMPDIR="/tmp/cprx-`date +\"%Y%m%d-%H%M\"`"
+
+    "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary"\
+    --proxy-server="socks=127.0.0.1:9050"\
+    --user-data-dir=$PROFTEMPDIR
+
+    rm -fr PROFTEMPDIR
+}
+chromium() {
+    PROFTEMPDIR="/tmp/cprx-`date +\"%Y%m%d-%H%M\"`"
+
+    "/Applications/Chromium.app/Contents/MacOS/Chromium"\
+    --user-data-dir=$PROFTEMPDIR
+
+    rm -fr PROFTEMPDIR
+}
 convert_x264() {
     ffmpeg -i $1 -f mp4 -threads 0 -vcodec h264 -vpre hqi -level 31 -crf 25 -acodec libfaac -ab 96k -ac 2 -async 30 -y $2
 }
