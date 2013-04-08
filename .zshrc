@@ -237,7 +237,7 @@ chrome_proxied2() {
     PROFTEMPDIR="/tmp/cprx-`date +\"%Y%m%d-%H%M\"`"
 
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"\
-    --proxy-server="socks5://127.0.0.1:9050"\
+    --proxy-server="socks5://127.0.0.1:14230"\
     --user-data-dir=$PROFTEMPDIR $@
 
     rm -fr PROFTEMPDIR
