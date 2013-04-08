@@ -224,29 +224,38 @@ tunnel3() {
 irctunnel() {
     ssh -v2aNCL 14240:irc.mozilla.org:6697 -c arcfour256,aes256-ctr -m hmac-sha1 173.45.236.2
 }
-cprx() {
+chrome_proxied() {
     PROFTEMPDIR="/tmp/cprx-`date +\"%Y%m%d-%H%M\"`"
 
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"\
-    --proxy-server="socks=127.0.0.1:14230"\
-    --user-data-dir=$PROFTEMPDIR
+    --proxy-server="socks5://127.0.0.1:9050"\
+    --user-data-dir=$PROFTEMPDIR $@
 
     rm -fr PROFTEMPDIR
 }
-chrc() {
+chrome_proxied2() {
     PROFTEMPDIR="/tmp/cprx-`date +\"%Y%m%d-%H%M\"`"
 
-    "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary"\
-    --user-data-dir=$PROFTEMPDIR
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"\
+    --proxy-server="socks5://127.0.0.1:9050"\
+    --user-data-dir=$PROFTEMPDIR $@
 
     rm -fr PROFTEMPDIR
 }
-cprxt() {
+canary() {
     PROFTEMPDIR="/tmp/cprx-`date +\"%Y%m%d-%H%M\"`"
 
     "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary"\
-    --proxy-server="socks=127.0.0.1:9050"\
-    --user-data-dir=$PROFTEMPDIR
+    --user-data-dir=$PROFTEMPDIR $@
+
+    rm -fr PROFTEMPDIR
+}
+canary_proxied() {
+    PROFTEMPDIR="/tmp/cprx-`date +\"%Y%m%d-%H%M\"`"
+
+    "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary"\
+    --proxy-server="socks5://127.0.0.1:9050"\
+    --user-data-dir=$PROFTEMPDIR $@
 
     rm -fr PROFTEMPDIR
 }
@@ -254,7 +263,16 @@ chromium() {
     PROFTEMPDIR="/tmp/cprx-`date +\"%Y%m%d-%H%M\"`"
 
     "/Applications/Chromium.app/Contents/MacOS/Chromium"\
-    --user-data-dir=$PROFTEMPDIR
+    --user-data-dir=$PROFTEMPDIR $@
+
+    rm -fr PROFTEMPDIR
+}
+chromium_proxied() {
+    PROFTEMPDIR="/tmp/cprx-`date +\"%Y%m%d-%H%M\"`"
+
+    "/Applications/Chromium.app/Contents/MacOS/Chromium"\
+    --proxy-server="socks5://127.0.0.1:9050"\
+    --user-data-dir=$PROFTEMPDIR $@
 
     rm -fr PROFTEMPDIR
 }
